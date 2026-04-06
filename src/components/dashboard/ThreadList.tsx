@@ -15,8 +15,8 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
   // Sort threads: Red > Yellow > Green, then by newest
   const sortedThreads = [...threads].sort((a, b) => {
     const riskWeight = { red: 3, yellow: 2, green: 1 };
-    if (riskWeight[a.risk_level] !== riskWeight[b.risk_level]) {
-      return riskWeight[b.risk_level] - riskWeight[a.risk_level];
+    if (riskWeight[a.status] !== riskWeight[b.status]) {
+      return riskWeight[b.status] - riskWeight[a.status];
     }
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
@@ -36,7 +36,7 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
         ) : (
           sortedThreads.map((thread) => {
             const isSelected = selectedThreadId === thread.id;
-            const isRed = thread.risk_level === 'red';
+            const isRed = thread.status === 'red';
             
             return (
               <motion.div
@@ -54,15 +54,15 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
 
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-sm font-semibold text-slate-900 truncate pr-2">
-                    {thread.patient_name}
+                    {thread.metadata?.patient_name || 'Incoming Patient'}
                   </h3>
                   <div className="flex-shrink-0">
-                    <RiskBadge level={thread.risk_level} />
+                    <RiskBadge level={thread.status} />
                   </div>
                 </div>
                 
                 <p className="text-xs text-slate-600 line-clamp-2 mb-3">
-                  {thread.last_message}
+                  {thread.metadata?.last_message || 'Initializing triage...'}
                 </p>
                 
                 <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
@@ -70,8 +70,8 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
                     <Clock className="w-3 h-3" />
                     <span>{formatDistanceToNow(new Date(thread.updated_at), { addSuffix: true })}</span>
                   </div>
-                  {thread.sentiment_score < -0.3 && (
-                    <span className="text-rose-500">Frustrated ({(thread.sentiment_score).toFixed(2)})</span>
+                  {thread.metadata?.sentiment_score < -0.3 && (
+                    <span className="text-rose-500">Frustrated ({(thread.metadata.sentiment_score).toFixed(2)})</span>
                   )}
                 </div>
               </motion.div>

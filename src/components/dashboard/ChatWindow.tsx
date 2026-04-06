@@ -43,7 +43,7 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
 
   const getSenderName = (type: string) => {
     switch(type) {
-      case 'patient': return thread.patient_name;
+      case 'patient': return thread.metadata?.patient_name || 'Patient';
       case 'ai': return 'Sakhi AI';
       case 'doctor': return 'Attending Doctor';
       case 'nurse': return 'Triage Nurse';
@@ -56,7 +56,7 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
       {/* Thread Header */}
       <div className="px-6 py-4 border-b border-slate-200 bg-white flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">{thread.patient_name}</h2>
+          <h2 className="text-xl font-bold text-slate-900">{thread.metadata?.patient_name || 'Incoming Patient'}</h2>
           <div className="flex items-center gap-3 mt-1">
             <span className="text-xs text-slate-500 font-medium">Status: {thread.status.toUpperCase()}</span>
             {thread.assigned_role && (
@@ -70,13 +70,13 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
         {/* Human Takeover logic. Only Dr can take over explicitly to kick out AI. 
             Or if already assigned to someone else. */}
         <div className="flex items-center gap-3">
-          {thread.status === 'open' && currentRole === 'doctor' && (
+          {!thread.assigned_user_id && currentRole === 'doctor' && (
             <Button onClick={onTakeover} size="sm" className="bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20 gap-2">
               <ShieldAlert className="w-4 h-4" />
               Emergency Takeover
             </Button>
           )}
-          {thread.status === 'open' && currentRole === 'nurse' && (
+          {!thread.assigned_user_id && currentRole === 'nurse' && (
             <Button onClick={onTakeover} size="sm" className="bg-amber-500 hover:bg-amber-600 shadow-md shadow-amber-500/20 gap-2">
               <HeartPulse className="w-4 h-4" />
               Claim Thread
@@ -115,7 +115,7 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
                         ? 'bg-white text-slate-800 border border-slate-200 rounded-tl-sm'
                         : 'bg-indigo-50 text-indigo-900 border border-indigo-100 rounded-tl-sm' // AI or other staff
                   }`}>
-                    {msg.message}
+                    {msg.content}
                   </div>
                 </div>
               </div>
@@ -132,13 +132,13 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
             type="text"
             value={inputText}
             onChange={e => setInputText(e.target.value)}
-            placeholder={thread.status !== 'assigned' ? "Take over the thread to send a message..." : "Type a secure medical response..."}
-            disabled={thread.status !== 'assigned' && currentRole !== 'cro'}
+            placeholder={thread.assigned_user_id ? "Type a secure medical response..." : "Take over the thread to send a message..."}
+            disabled={!thread.assigned_user_id && currentRole !== 'cro'}
             className="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 disabled:bg-slate-50 disabled:text-slate-400 transition-shadow"
           />
           <Button 
             type="submit" 
-            disabled={sending || !inputText.trim() || (thread.status !== 'assigned' && currentRole !== 'cro')}
+            disabled={sending || !inputText.trim() || (!thread.assigned_user_id && currentRole !== 'cro')}
             className={`px-5 rounded-xl flex items-center gap-2 ${inputText.trim() ? 'bg-sky-500 hover:bg-sky-600 shadow-lg shadow-sky-500/20' : 'bg-slate-200 text-slate-400'}`}
           >
             {sending ? 'Sending...' : <><Send className="w-4 h-4" /> Send</>}

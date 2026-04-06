@@ -47,7 +47,7 @@ export function SelectRole() {
     setLoading(role);
 
     const { error } = await supabase
-      .from('profiles')
+      .from('users')
       .update({ role: role })
       .eq('id', user.id);
 

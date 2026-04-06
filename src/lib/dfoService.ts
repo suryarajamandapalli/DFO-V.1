@@ -4,14 +4,16 @@ import { supabase } from './supabase';
 export const simulateIncomingPatientMessage = async (patientName: string, text: string, riskLevel: 'green' | 'yellow' | 'red') => {
   // 1. Create a dummy thread
   const { data: thread, error: threadErr } = await supabase
-    .from('threads')
+    .from('conversation_threads')
     .insert([
       {
-        patient_name: patientName,
-        last_message: text,
-        risk_level: riskLevel,
-        sentiment_score: riskLevel === 'red' ? -0.9 : riskLevel === 'yellow' ? -0.4 : 0.8,
-        status: 'open'
+        channel: 'web',
+        metadata: {
+          patient_name: patientName,
+          last_message: text,
+          sentiment_score: riskLevel === 'red' ? -0.9 : riskLevel === 'yellow' ? -0.4 : 0.8
+        },
+        status: riskLevel
       }
     ])
     .select()
@@ -24,23 +26,23 @@ export const simulateIncomingPatientMessage = async (patientName: string, text: 
 
   // 2. Insert the message
   await supabase
-    .from('messages')
+    .from('conversation_messages')
     .insert([
       {
         thread_id: thread.id,
         sender_type: 'patient',
-        message: text
+        content: text
       }
     ]);
     
   // 3. Insert Sakhi AI automated reply immediately
   await supabase
-    .from('messages')
+    .from('conversation_messages')
     .insert([
       {
         thread_id: thread.id,
         sender_type: 'ai',
-        message: "Your message has been received by our clinical system. A triage specialist will review this shortly."
+        content: "Your message has been received by our clinical system. A triage specialist will review this shortly."
       }
     ]);
 };
@@ -48,23 +50,28 @@ export const simulateIncomingPatientMessage = async (patientName: string, text: 
 // Send a clinical message
 export const sendClinicalMessage = async (threadId: string, role: string, userId: string, message: string) => {
   const { error } = await supabase
-    .from('messages')
+    .from('conversation_messages')
     .insert([
       {
         thread_id: threadId,
         sender_type: role,
         sender_id: userId,
-        message: message
+        content: message
       }
     ]);
     
   if (error) throw error;
   
-  // Update last_message on thread to keep list fresh
+  // Update metadata on thread to keep list fresh
+  
+  // First fetch the old thread to preserve existing metadata
+  const { data: thr } = await supabase.from('conversation_threads').select('metadata').eq('id', threadId).single();
+  const meta = thr?.metadata || {};
+  
   await supabase
-    .from('threads')
+    .from('conversation_threads')
     .update({ 
-      last_message: '(Clinical Staff) ' + message,
+      metadata: { ...meta, last_message: '(Clinical) ' + message },
       updated_at: new Date().toISOString()
     })
     .eq('id', threadId);
@@ -73,11 +80,12 @@ export const sendClinicalMessage = async (threadId: string, role: string, userId
 // Takeover Thread
 export const takeoverThread = async (threadId: string, role: 'nurse' | 'doctor', userId: string) => {
   const { error } = await supabase
-    .from('threads')
+    .from('conversation_threads')
     .update({ 
-      assigned_to: userId,
+      assigned_user_id: userId,
       assigned_role: role,
-      status: 'assigned',
+      ownership: 'Clinical',
+      is_locked: true,
       updated_at: new Date().toISOString()
     })
     .eq('id', threadId);
@@ -86,12 +94,12 @@ export const takeoverThread = async (threadId: string, role: 'nurse' | 'doctor',
   
   // Inject automated takeover log
   await supabase
-    .from('messages')
+    .from('conversation_messages')
     .insert([
       {
         thread_id: threadId,
         sender_type: 'ai',
-        message: `🚨 THREAD TAKEOVER: A human ${role} has claimed this thread. Automated AI routing is now disabled.`
+        content: `🚨 THREAD TAKEOVER: A human ${role} has claimed this thread. Automated AI routing is now disabled.`
       }
     ]);
 };

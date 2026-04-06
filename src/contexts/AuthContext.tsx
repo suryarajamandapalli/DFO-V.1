@@ -44,31 +44,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     
     // Fetch profile
-    const { data: profileData, error: profileErr } = await supabase
-      .from('profiles')
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
       .select('*')
       .eq('id', user.id)
       .single();
 
-    if (!profileErr && profileData) {
+    if (profileError) {
+      console.error("Profile fetch error:", profileError.message);
+    }
+
+    if (profileData) {
       setProfile(profileData);
       
-      // If role exists, check onboarding
-      if (profileData.role) {
-        const { data: onbData, error: onbErr } = await supabase
-          .from('onboarding_data')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-          
-        if (!onbErr && onbData) {
-          setOnboardingState(onbData);
-        } else {
-          setOnboardingState(null);
-        }
-      } else {
-        setOnboardingState(null);
-      }
+      // Auto-bypass onboarding state since the db lacks the table
+      setOnboardingState(profileData.role ? ({ completed: true } as any) : null);
     } else {
       setProfile(null);
       setOnboardingState(null);

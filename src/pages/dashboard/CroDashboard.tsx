@@ -22,9 +22,9 @@ export function CroDashboard() {
     if (!user) return;
     
     const fetchThreads = async () => {
-      let query = supabase.from('threads').select('*').order('updated_at', { ascending: false });
+      let query = supabase.from('conversation_threads').select('*').order('updated_at', { ascending: false });
       if (filter !== 'all') {
-        query = query.eq('risk_level', filter);
+        query = query.eq('status', filter);
       }
       
       const { data } = await query;
@@ -35,10 +35,10 @@ export function CroDashboard() {
 
     // Listen to realtime thread updates globally
     const threadSub = supabase.channel('cro-threads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'threads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_threads' }, payload => {
         const newThread = payload.new as Thread;
         // Apply filter manually for realtime updates
-        if (filter !== 'all' && newThread.risk_level !== filter) return;
+        if (filter !== 'all' && newThread.status !== filter) return;
         
         setThreads(current => {
           const exists = current.find(t => t.id === newThread.id);
@@ -60,7 +60,7 @@ export function CroDashboard() {
     
     const fetchMessages = async () => {
       const { data } = await supabase
-        .from('messages')
+        .from('conversation_messages')
         .select('*')
         .eq('thread_id', activeThreadId)
         .order('created_at', { ascending: true });
@@ -71,7 +71,7 @@ export function CroDashboard() {
     fetchMessages();
 
     const msgSub = supabase.channel(`messages-cro-${activeThreadId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversation_messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
         setMessages(current => [...current, payload.new as Message]);
       })
       .subscribe();

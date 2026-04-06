@@ -21,9 +21,9 @@ export function NurseDashboard() {
     
     const fetchThreads = async () => {
       const { data } = await supabase
-        .from('threads')
+        .from('conversation_threads')
         .select('*')
-        .or(`risk_level.eq.yellow,assigned_to.eq.${user.id}`)
+        .or(`status.eq.yellow,assigned_user_id.eq.${user.id}`)
         .order('updated_at', { ascending: false });
         
       if (data) setThreads(data);
@@ -33,10 +33,10 @@ export function NurseDashboard() {
 
     // Listen to realtime thread updates
     const threadSub = supabase.channel('nurse-threads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'threads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_threads' }, payload => {
         const newThread = payload.new as Thread;
         // Only keep if yellow or assigned to them explicitly
-        if (newThread.risk_level === 'yellow' || newThread.assigned_to === user.id) {
+        if (newThread.status === 'yellow' || newThread.assigned_user_id === user.id) {
           setThreads(current => {
             const exists = current.find(t => t.id === newThread.id);
             if (exists) return current.map(t => t.id === newThread.id ? newThread : t);
@@ -58,7 +58,7 @@ export function NurseDashboard() {
     
     const fetchMessages = async () => {
       const { data } = await supabase
-        .from('messages')
+        .from('conversation_messages')
         .select('*')
         .eq('thread_id', activeThreadId)
         .order('created_at', { ascending: true });
@@ -69,7 +69,7 @@ export function NurseDashboard() {
     fetchMessages();
 
     const msgSub = supabase.channel(`messages-${activeThreadId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversation_messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
         setMessages(current => [...current, payload.new as Message]);
       })
       .subscribe();
