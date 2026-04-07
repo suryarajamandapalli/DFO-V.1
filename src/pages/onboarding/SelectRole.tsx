@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { AppRole } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldAlert, HeartPulse, Stethoscope, ArrowRight, Loader2 } from 'lucide-react';
 
@@ -42,20 +43,42 @@ export function SelectRole() {
     }
   ];
 
+  const navigate = useNavigate();
+
   const handleRoleSelect = async (role: AppRole) => {
-    if (!user) return;
+    if (!user) {
+      console.error("No user found for role selection");
+      return;
+    }
     setLoading(role);
 
-    const { error } = await supabase
-      .from('users')
-      .update({ role: role })
-      .eq('id', user.id);
+    try {
+      // Use UPSERT instead of UPDATE to ensure a row is created if missing
+      const { error: upsertError } = await supabase
+        .from('users')
+        .upsert({ 
+          id: user.id,
+          role: role,
+          email: user.email // Added to satisfy not-null constraint in users table
+        });
 
-    if (!error) {
+      if (upsertError) {
+        console.error("UPSERT error for 'users' table:", upsertError);
+        throw upsertError;
+      }
+      
+      console.log(`Successfully assigned role: ${role}`);
+      
       // Refresh Auth Context to trigger navigation
       await refreshProfile();
-    } else {
-      console.error("Failed to set role:", error);
+      
+      // Explicit navigation as a fallback/accelerator
+      navigate(`/dashboard/${role}`);
+    } catch (err: any) {
+      console.error("Critical failure resetting role:", err.message);
+      // Alert the user with more context
+      alert(`Role assignment failed: ${err.message}. (FALLBACK ACTIVE: You can click 'Preview Dashboard' below to skip this for now)`);
+    } finally {
       setLoading(null);
     }
   };
@@ -77,8 +100,22 @@ export function SelectRole() {
             transition={{ delay: 0.1 }}
             className="text-slate-600 text-lg max-w-2xl mx-auto"
           >
-            Please choose your role in the JanmaSethu Digital Front Office system. This will customize your onboarding pathway and dashboard interface.
+            Please choose your role. This will customize your dashboard view.
           </motion.p>
+          
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full px-4">Development Environment</p>
+            <button 
+              onClick={() => {
+                // Mock context and navigate immediately
+                refreshProfile();
+                navigate('/dashboard/cro');
+              }}
+              className="mt-2 text-sky-600 text-xs font-bold hover:underline"
+            >
+              🚀 Bypass Role Selection & Check Dashboard (Temporary)
+            </button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">

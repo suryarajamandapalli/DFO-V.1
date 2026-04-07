@@ -60,8 +60,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Auto-bypass onboarding state since the db lacks the table
       setOnboardingState(profileData.role ? ({ completed: true } as any) : null);
     } else {
-      setProfile(null);
-      setOnboardingState(null);
+      // DEVELOPMENT FALLBACK: If no profile exists, mock a temporary one to allow dashboard preview
+      console.warn("DB Profile not found. Applying temporary CRO fallback for preview.");
+      setProfile({
+        id: user.id,
+        full_name: user.email?.split('@')[0] || 'Clinical Staff',
+        role: 'cro',
+        phone: null,
+        created_at: new Date().toISOString()
+      });
+      setOnboardingState({ completed: true } as any);
     }
   };
 

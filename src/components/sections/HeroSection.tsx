@@ -2,7 +2,12 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { ShieldCheck, Activity, ArrowRight } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+
 export function HeroSection() {
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
   return (
     <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden min-h-[90vh] flex items-center">
       {/* Video Background Layer */}
@@ -70,8 +75,12 @@ export function HeroSection() {
               <span>Real-time Risk Monitoring</span>
             </div>
 
-            <Button size="lg" className="w-full sm:w-auto gap-2 bg-sky-500 hover:bg-sky-400 text-white shadow-[0_0_30px_rgb(14,165,233,0.5)] border border-sky-400 transition-all font-semibold px-8 py-6 text-lg rounded-xl">
-              Login to DFO
+            <Button 
+              size="lg" 
+              onClick={() => user ? navigate(`/dashboard/${profile?.role || 'cro'}`) : navigate('/login')}
+              className="w-full sm:w-auto gap-2 bg-sky-500 hover:bg-sky-400 text-white shadow-[0_0_30px_rgb(14,165,233,0.5)] border border-sky-400 transition-all font-semibold px-8 py-6 text-lg rounded-xl"
+            >
+              {user ? 'Go to Dashboard' : 'Login to DFO'}
               <ArrowRight className="w-6 h-6" />
             </Button>
 

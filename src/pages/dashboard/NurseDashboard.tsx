@@ -4,11 +4,13 @@ import { supabase } from '../../lib/supabase';
 import type { Thread, Message } from '../../lib/types';
 import { ThreadList } from '../../components/dashboard/ThreadList';
 import { ChatWindow } from '../../components/dashboard/ChatWindow';
-import { LogOut, HeartPulse } from 'lucide-react';
-import { sendClinicalMessage, takeoverThread } from '../../lib/dfoService';
+import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
+import { ThreadInfoPanel } from '../../components/dashboard/ThreadInfoPanel';
+import { HeartPulse, Activity } from 'lucide-react';
+import { sendClinicalMessage, assignThread } from '../../lib/dfoService';
 
 export function NurseDashboard() {
-  const { user, profile, signOut } = useAuth();
+  const { user } = useAuth();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,22 +23,22 @@ export function NurseDashboard() {
     
     const fetchThreads = async () => {
       const { data } = await supabase
-        .from('conversation_threads')
+        .from('threads')
         .select('*')
-        .or(`status.eq.yellow,assigned_user_id.eq.${user.id}`)
-        .order('updated_at', { ascending: false });
+        .or(`risk_level.eq.yellow,assigned_to.eq.${user.id}`)
+        .order('created_at', { ascending: false });
         
-      if (data) setThreads(data);
+      if (data) setThreads(data as Thread[]);
     };
     
     fetchThreads();
 
     // Listen to realtime thread updates
     const threadSub = supabase.channel('nurse-threads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_threads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'threads' }, payload => {
         const newThread = payload.new as Thread;
         // Only keep if yellow or assigned to them explicitly
-        if (newThread.status === 'yellow' || newThread.assigned_user_id === user.id) {
+        if (newThread.risk_level === 'yellow' || newThread.assigned_to === user.id) {
           setThreads(current => {
             const exists = current.find(t => t.id === newThread.id);
             if (exists) return current.map(t => t.id === newThread.id ? newThread : t);
@@ -58,18 +60,18 @@ export function NurseDashboard() {
     
     const fetchMessages = async () => {
       const { data } = await supabase
-        .from('conversation_messages')
+        .from('messages')
         .select('*')
         .eq('thread_id', activeThreadId)
         .order('created_at', { ascending: true });
         
-      if (data) setMessages(data);
+      if (data) setMessages(data as Message[]);
     };
     
     fetchMessages();
 
-    const msgSub = supabase.channel(`messages-${activeThreadId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversation_messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
+    const msgSub = supabase.channel(`messages-nurse-${activeThreadId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${activeThreadId}` }, payload => {
         setMessages(current => [...current, payload.new as Message]);
       })
       .subscribe();
@@ -78,30 +80,18 @@ export function NurseDashboard() {
   }, [activeThreadId]);
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
-            <HeartPulse className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-800">Triage Queue Central</h1>
-            <p className="text-xs text-amber-600 font-medium tracking-wide uppercase">Nurse Dashboard</p>
-          </div>
+    <DashboardLayout 
+      activeMenu="threads"
+      rightPanel={activeThread ? <ThreadInfoPanel thread={activeThread} /> : (
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center opacity-30">
+          <Activity className="w-12 h-12 mb-4" />
+          <p className="text-[10px] font-black uppercase tracking-widest leading-loose">
+            Select a case to view <br /> Patient Intelligence
+          </p>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="text-right hidden md:block">
-            <p className="text-sm font-semibold text-slate-700">{profile?.full_name}</p>
-            <p className="text-xs text-slate-500">Triage Nurse</p>
-          </div>
-          <button onClick={signOut} className="text-slate-400 hover:text-slate-600 transition-colors p-2">
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
-
-      <main className="flex-1 flex overflow-hidden">
+      )}
+    >
+      <div className="flex-1 flex overflow-hidden">
         <ThreadList 
           threads={threads} 
           selectedThreadId={activeThreadId}
@@ -109,21 +99,42 @@ export function NurseDashboard() {
         />
         
         {activeThread ? (
-          <ChatWindow 
-            thread={activeThread}
-            messages={messages}
-            currentRole="nurse"
-            onSendMessage={(msg) => sendClinicalMessage(activeThread.id, 'nurse', user!.id, msg)}
-            onTakeover={() => takeoverThread(activeThread.id, 'nurse', user!.id)}
-          />
+          <div className="flex-1 flex flex-col min-w-0 bg-white">
+            <div className="px-6 py-2 border-b border-slate-50 flex items-center justify-between bg-white z-10">
+               <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinical Session</span>
+               </div>
+               {!activeThread.assigned_to && (
+                 <button 
+                  onClick={() => assignThread(activeThread.id, 'nurse', user!.id)}
+                  className="flex items-center gap-2 text-[10px] font-black bg-amber-50 text-amber-600 px-3 py-1.5 rounded-lg border border-amber-100 hover:bg-amber-100 transition-colors uppercase tracking-wider"
+                 >
+                   Claim Triage Thread
+                 </button>
+               )}
+            </div>
+            
+            <ChatWindow 
+              thread={activeThread}
+              messages={messages}
+              currentRole="nurse"
+              onSendMessage={(msg) => sendClinicalMessage(activeThread.id, 'nurse', user!.id, msg)}
+              onTakeover={() => assignThread(activeThread.id, 'nurse', user!.id)}
+            />
+          </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 text-slate-400">
-            <HeartPulse className="w-16 h-16 mb-4 text-slate-300" />
-            <p className="text-lg font-medium text-slate-500">Select a Yellow Thread</p>
-            <p className="text-sm">Routine triage cases require attention within 15 mins.</p>
+          <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/20 text-slate-400 p-12">
+             <div className="p-8 rounded-full bg-white shadow-sm border border-slate-100 mb-6 font-bold">
+                <HeartPulse className="w-12 h-12 text-rose-200" />
+             </div>
+             <h2 className="text-xl font-black text-slate-800 tracking-tight mb-2">Triage Queue</h2>
+             <p className="text-sm font-medium text-slate-500 max-w-xs text-center leading-relaxed">
+                Routine maternal queries and yellow-risk threads require triage within 15 minutes.
+             </p>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
+

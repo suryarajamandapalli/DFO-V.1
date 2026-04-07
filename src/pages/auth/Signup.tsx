@@ -43,7 +43,7 @@ export function Signup() {
     if (authData.user) {
       // 2. We must manually create the profile row here since there's no stated DB trigger.
       const { error: profileError } = await supabase
-        .from('profiles')
+        .from('users')
         .upsert([
           {
             id: authData.user.id,

@@ -17,7 +17,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
   return (
-    <BrowserRouter basename="/Clinical-OS-V.1">
+    <BrowserRouter>
       {/* Some pages like dashboards might not need the main landing Navbar, but for simplicity we keep it global or page-specific. 
           Actually, let's keep Navbar inside the Landing page layout, OR conditionally render it. 
           Since it's a root component, we can conditionally hide it on auth/dashboard routes, 

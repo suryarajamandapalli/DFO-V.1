@@ -1,6 +1,11 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 
 export function CTASection() {
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+  
   return (
     <section className="py-24 relative overflow-hidden bg-sky-600">
       {/* Abstract Background pattern */}
@@ -17,10 +22,19 @@ export function CTASection() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-white text-sky-600 hover:bg-slate-50 border-transparent shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-              Login to DFO
+            <Button 
+              size="lg" 
+              onClick={() => user ? navigate(`/dashboard/${profile?.role || 'cro'}`) : navigate('/login')}
+              className="bg-white text-sky-600 hover:bg-slate-50 border-transparent shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+            >
+              {user ? 'My Dashboard' : 'Login to DFO'}
             </Button>
-            <Button size="lg" variant="outline" className="border-sky-300 text-white hover:bg-sky-500 hover:border-white">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={() => navigate('/signup')}
+              className="border-sky-300 text-white hover:bg-sky-500 hover:border-white"
+            >
               Request Platform Access
             </Button>
           </div>
