@@ -7,6 +7,7 @@ export type AppRole = 'cro' | 'nurse' | 'doctor';
 
 export interface UserProfile {
   id: string;
+  email: string | null;
   full_name: string | null;
   role: AppRole | null;
   phone: string | null;
@@ -56,20 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (profileData) {
       setProfile(profileData);
-      
-      // Auto-bypass onboarding state since the db lacks the table
       setOnboardingState(profileData.role ? ({ completed: true } as any) : null);
     } else {
-      // DEVELOPMENT FALLBACK: If no profile exists, mock a temporary one to allow dashboard preview
-      console.warn("DB Profile not found. Applying temporary CRO fallback for preview.");
-      setProfile({
-        id: user.id,
-        full_name: user.email?.split('@')[0] || 'Clinical Staff',
-        role: 'cro',
-        phone: null,
-        created_at: new Date().toISOString()
-      });
-      setOnboardingState({ completed: true } as any);
+      setProfile(null);
+      setOnboardingState(null);
     }
   };
 

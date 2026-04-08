@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { ShieldAlert, HeartPulse, Stethoscope, ArrowRight, Loader2 } from 'lucide-react';
 
 export function SelectRole() {
-  const { user, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [loading, setLoading] = useState<AppRole | null>(null);
 
   const roles = [
@@ -59,8 +59,9 @@ export function SelectRole() {
         .upsert({ 
           id: user.id,
           role: role,
-          email: user.email // Added to satisfy not-null constraint in users table
-        });
+          email: user.email,
+          full_name: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Clinical Member'
+        }, { onConflict: 'email' }); // Priority on email uniqueness to merge legacy/orphaned records
 
       if (upsertError) {
         console.error("UPSERT error for 'users' table:", upsertError);
@@ -76,8 +77,7 @@ export function SelectRole() {
       navigate(`/dashboard/${role}`);
     } catch (err: any) {
       console.error("Critical failure resetting role:", err.message);
-      // Alert the user with more context
-      alert(`Role assignment failed: ${err.message}. (FALLBACK ACTIVE: You can click 'Preview Dashboard' below to skip this for now)`);
+      alert(`Role assignment failed: ${err.message}. Please try again or contact system administration.`);
     } finally {
       setLoading(null);
     }

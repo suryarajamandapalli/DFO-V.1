@@ -110,9 +110,9 @@ export function DashboardLayout({ children, activeMenu = 'dashboard', rightPanel
   );
 
   return (
-    <div className="h-screen bg-[#F9FAFB] flex overflow-hidden font-sans selection:bg-sky-100">
+    <div className="h-screen bg-[#0f172a] flex overflow-hidden font-sans selection:bg-sky-100">
       {/* 1. DESKTOP SIDEBAR */}
-      <aside className="hidden lg:flex w-72 flex-shrink-0 bg-[#0f172a] z-40 relative shadow-[1px_0_0_0_#0f172a]">
+      <aside className="hidden lg:flex w-72 flex-shrink-0 bg-[#0f172a] z-40 relative">
         <SidebarContent />
       </aside>
 
@@ -146,8 +146,8 @@ export function DashboardLayout({ children, activeMenu = 'dashboard', rightPanel
         )}
       </AnimatePresence>
 
-      {/* 3. MAIN WORKSPACE */}
-      <div className="flex-1 min-w-0 flex flex-col overflow-hidden relative">
+      {/* 3. MAIN WORKSPACE (Light background on top of dark root to hide gaps) */}
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden relative bg-[#F9FAFB]">
         {/* GLOBAL HEADER */}
         <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-8 z-30 shrink-0 sticky top-0">
           <div className="flex items-center gap-4 flex-1">

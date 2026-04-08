@@ -47,19 +47,19 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-premium);
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+.custom-scrollbar-dark::-webkit-scrollbar {
   width: 4px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar-dark::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #E2E8F0;
+.custom-scrollbar-dark::-webkit-scrollbar-thumb {
+  background: #1e293b;
   border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #CBD5E1;
+.custom-scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }

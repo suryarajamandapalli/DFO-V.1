@@ -13,10 +13,10 @@ export function OperationsSummary() {
   useEffect(() => {
     async function fetchStats() {
       // 1. Threads Stats
-      const { data: threads } = await supabase.from('threads').select('status, risk_level');
+      const { data: threads } = await supabase.from('conversation_threads').select('status, ownership');
       if (threads) {
-        const active = threads.filter(t => t.status !== 'closed').length;
-        const critical = threads.filter(t => t.risk_level === 'red').length;
+        const active = threads.filter(t => t.ownership !== 'closed').length;
+        const critical = threads.filter(t => t.status === 'red').length;
         
         // 2. SLA Stats (from janmasethu_analytics)
         const { data: analytics } = await supabase.from('janmasethu_analytics').select('sla_met, response_time_ms');

@@ -28,10 +28,13 @@ export function Signup() {
     setError(null);
     setSuccess(false);
 
-    // 1. Sign up to Auth
+    // 1. Sign up to Auth with direct redirect to onboarding
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/select-role`, // Take them directly to role selection after confirmation
+      }
     });
 
     if (authError) {
@@ -41,19 +44,21 @@ export function Signup() {
     }
 
     if (authData.user) {
-      // 2. We must manually create the profile row here since there's no stated DB trigger.
+      // 2. Resilient Profile Creation: UPSERT by email if it exists, otherwise by ID
+      // This handles cases where a user was deleted but their profile row remained.
       const { error: profileError } = await supabase
         .from('users')
         .upsert([
           {
             id: authData.user.id,
+            email: email, 
             full_name: fullName,
             created_at: new Date().toISOString(),
           }
-        ]);
+        ], { onConflict: 'email' }); // Focus on email uniqueness to reclaim orphaned rows
         
       if (profileError) {
-        console.error('Profile insertion error:', profileError);
+        console.warn('Non-blocking profile sync warning:', profileError.message);
       }
     }
     
