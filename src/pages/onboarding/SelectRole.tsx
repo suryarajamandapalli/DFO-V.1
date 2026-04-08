@@ -141,7 +141,7 @@ export function SelectRole() {
                 {loading === role.id ? (
                   <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
                 ) : (
-                  <div className={`p-2 rounded-full ${role.bgColor} group-hover:bg-opacity-80 transition-colors`}>
+                  <div className={`p-2 rounded-lg ${role.bgColor} group-hover:bg-opacity-80 transition-colors`}>
                     <ArrowRight className={`w-5 h-5 ${role.color}`} />
                   </div>
                 )}

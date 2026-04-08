@@ -139,23 +139,23 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
         
         <div className="space-y-4">
             {/* Journey Status */}
-            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
                 {currentJourney === 'pregnant' ? <Baby className="w-12 h-12" /> : <Activity className="w-12 h-12" />}
               </div>
               
               <div className="relative z-10">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Stage & Progress</p>
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 border border-sky-100/50">
-                    {currentJourney === 'pregnant' ? <Baby className="w-7 h-7" /> : <Activity className="w-7 h-7" />}
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 border border-sky-100/50">
+                    {currentJourney === 'pregnant' ? <Baby className="w-6 h-6" /> : <Activity className="w-6 h-6" />}
                   </div>
                   <div>
-                    <p className="text-lg font-black text-slate-900 leading-none mb-1 capitalize">
+                    <p className="text-base font-black text-slate-900 leading-none mb-1 capitalize">
                       {currentJourney.replace(/_/g, ' ')}
                     </p>
                     <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest leading-none">
-                      Active Engagement
+                      Operational Lead
                     </p>
                   </div>
                 </div>
@@ -163,24 +163,24 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
                 {(patientData?.pregnancy_stage || thread.pregnancy_stage) ? (
                   <div className="space-y-3">
                     <div className="flex justify-between items-end">
-                      <span className="text-[11px] font-black text-slate-800 uppercase">
+                      <span className="text-[10px] font-black text-slate-800 uppercase tracking-tight">
                         {patientData?.pregnancy_stage || thread.pregnancy_stage} Weeks Completed
                       </span>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         Term: 40w
                       </span>
                     </div>
-                    <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-50">
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-50">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${((patientData?.pregnancy_stage || thread.pregnancy_stage || 0) / 40) * 100}%` }}
-                        className="h-full bg-sky-500 rounded-full shadow-[0_0_8px_rgba(14,165,233,0.4)]"
+                        className="h-full bg-sky-500 rounded-full"
                       />
                     </div>
                   </div>
                 ) : (
-                  <div className="py-2 px-3 bg-slate-50 rounded-xl border border-slate-100 inline-block">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Awaiting Stage Update</span>
+                  <div className="py-2 px-3 bg-slate-50 rounded-lg border border-slate-100 inline-block">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pending Onboarding</span>
                   </div>
                 )}
               </div>

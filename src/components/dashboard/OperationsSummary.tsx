@@ -58,10 +58,10 @@ export function OperationsSummary() {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 gap-6 mb-8">
-      <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 hover:scale-[1.02] transition-transform">
-        <div className="p-3.5 bg-sky-50 rounded-2xl text-sky-600">
-           <Activity className="w-6 h-6" />
+    <div className="grid grid-cols-4 gap-5 mb-6">
+      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-sky-100 transition-all">
+        <div className="p-3 bg-sky-50 rounded-xl text-sky-600">
+           <Activity className="w-5 h-5" />
         </div>
         <div>
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Total Census</p>
@@ -69,9 +69,9 @@ export function OperationsSummary() {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 hover:scale-[1.02] transition-transform">
-        <div className="p-3.5 bg-rose-50 rounded-2xl text-rose-600">
-           <ShieldAlert className="w-6 h-6" />
+      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-rose-100 transition-all">
+        <div className="p-3 bg-rose-50 rounded-xl text-rose-600">
+           <ShieldAlert className="w-5 h-5" />
         </div>
         <div>
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Critical Red</p>
@@ -79,9 +79,9 @@ export function OperationsSummary() {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 hover:scale-[1.02] transition-transform">
-        <div className="p-3.5 bg-emerald-50 rounded-2xl text-emerald-600">
-           <CheckCircle2 className="w-6 h-6" />
+      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-emerald-100 transition-all">
+        <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+           <CheckCircle2 className="w-5 h-5" />
         </div>
         <div>
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Daily Inflow</p>
@@ -89,12 +89,12 @@ export function OperationsSummary() {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 hover:scale-[1.02] transition-transform">
-        <div className="p-3.5 bg-indigo-50 rounded-2xl text-indigo-600">
-           <Clock className="w-6 h-6" />
+      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-indigo-100 transition-all">
+        <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+           <Clock className="w-5 h-5" />
         </div>
         <div>
-           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">SLA Meta-Score</p>
+           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">SLA Compliance</p>
            <p className="text-xl font-black text-slate-900">{stats.sla_met_pct || 98}%</p>
         </div>
       </div>

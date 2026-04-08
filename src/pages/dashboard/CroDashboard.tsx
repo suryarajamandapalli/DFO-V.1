@@ -137,13 +137,13 @@ export function CroDashboard() {
         
         <OperationsSummary />
 
-        <div className="flex-1 flex overflow-hidden rounded-[2.5rem] border border-slate-200/60 shadow-bespoke bg-white min-h-0 mt-8">
+        <div className="flex-1 flex overflow-hidden rounded-2xl border border-slate-200/60 shadow- premium bg-white min-h-0 mt-6">
           {/* Thread List Column */}
           <div className="w-80 flex-shrink-0 flex flex-col border-r border-slate-100 bg-white">
-             <div className="p-5 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+             <div className="p-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                   <Filter className="w-3.5 h-3.5" />
-                  Fleet Inbox
+                  Fleet Control
                 </span>
              </div>
              <div className="flex-1 overflow-hidden">
@@ -170,10 +170,10 @@ export function CroDashboard() {
                        <Button 
                          onClick={() => setShowAssignModal(true)}
                          size="sm"
-                         className="bg-slate-900 text-white hover:bg-sky-600 h-11 px-6 text-[10px] font-black uppercase tracking-[0.15em] shadow-bespoke transition-all rounded-2xl group"
+                         className="bg-slate-900 text-white hover:bg-sky-600 h-10 px-6 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all rounded-xl group"
                        >
-                         <UserPlus className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
-                         Handover Case
+                         <UserPlus className="w-4 h-4 mr-2" />
+                         Handover
                        </Button>
                     </div>
                  </div>

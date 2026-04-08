@@ -76,8 +76,8 @@ export function PatientsOverview() {
              { label: 'High Risk Coverage', value: '12%', icon: TrendingUp, color: 'text-rose-600', bg: 'bg-rose-50' },
              { label: 'Journey Active', value: patients.filter(p => p.journey_stage === 'pregnant').length, icon: Baby, color: 'text-indigo-600', bg: 'bg-indigo-50' },
            ].map((stat, idx) => (
-             <div key={idx} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-premium flex items-center gap-5">
-                <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl`}>
+             <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
+                <div className={`p-4 ${stat.bg} ${stat.color} rounded-xl`}>
                    <stat.icon className="w-6 h-6" />
                 </div>
                 <div>
@@ -89,7 +89,7 @@ export function PatientsOverview() {
         </div>
 
         {/* PATIENTS TABLE/GRID */}
-        <div className="flex-1 overflow-hidden rounded-[2.5rem] border border-slate-200/60 bg-white shadow-bespoke">
+        <div className="flex-1 overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm">
           <div className="h-full flex flex-col">
             <div className="px-8 py-5 border-b border-slate-50 grid grid-cols-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                <div className="col-span-2">Patient Details</div>
@@ -117,10 +117,10 @@ export function PatientsOverview() {
                      animate={{ opacity: 1, y: 0 }}
                      transition={{ delay: idx * 0.05 }}
                      key={p.id} 
-                     className="px-8 py-6 grid grid-cols-6 items-center border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                     className="px-8 py-5 grid grid-cols-6 items-center border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer"
                    >
                      <div className="col-span-2 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold group-hover:bg-sky-50 group-hover:text-sky-600 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold group-hover:bg-sky-50 group-hover:text-sky-600 transition-colors">
                            {p.full_name?.charAt(0) || <Activity className="w-5 h-5" />}
                         </div>
                         <div>
@@ -158,7 +158,7 @@ export function PatientsOverview() {
                      </div>
 
                      <div className="text-right">
-                        <button className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-sm">
+                        <button className="p-2 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all">
                            <ChevronRight className="w-4 h-4" />
                         </button>
                      </div>

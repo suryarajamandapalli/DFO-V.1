@@ -100,13 +100,13 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50/30 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-6 space-y-7 bg-slate-50/20 custom-scrollbar">
         {messages.length === 0 ? (
-          <div className="text-center text-slate-400 text-sm mt-24 flex flex-col items-center gap-5">
-             <div className="bg-white p-6 rounded-[2rem] shadow-premium border border-slate-100">
-               <Bot className="w-10 h-10 text-slate-200" />
+          <div className="text-center text-slate-400 text-sm mt-32 flex flex-col items-center gap-6">
+             <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                <Bot className="w-8 h-8 text-slate-200" />
              </div>
-             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300">No secure clinical messages yet</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Awaiting secure clinical packets</p>
           </div>
         ) : (
           messages.map((msg) => {
@@ -118,27 +118,30 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
 
             return (
               <div key={msg.id} className={`flex gap-4 ${isMe ? 'flex-row-reverse' : ''}`}>
-                <div className={`mt-1 flex-shrink-0 bg-white rounded-2xl p-2 shadow-premium border border-slate-100 ${isMe ? 'hidden' : ''}`}>
+                <div className={`mt-1 flex-shrink-0 bg-white rounded-xl p-2 shadow-sm border border-slate-100 ${isMe ? 'hidden' : ''}`}>
                   {getSenderIcon(msg.sender_type)}
                 </div>
                 
-                <div className={`flex flex-col max-w-[800px] min-w-[120px] ${isMe ? 'items-end ml-auto' : 'items-start mr-auto'}`}>
-                  <div className={`text-[10px] text-slate-400 font-bold mb-1.5 flex items-center gap-3 uppercase tracking-widest ${isMe ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-col max-w-[75%] min-w-[120px] ${isMe ? 'items-end ml-auto' : 'items-start mr-auto'}`}>
+                  <div className={`text-[9px] text-slate-400 font-bold mb-1.5 flex items-center gap-2 uppercase tracking-widest ${isMe ? 'flex-row-reverse' : ''}`}>
                     <span className={isMe ? 'text-sky-600 font-black' : isAI ? 'text-indigo-600 font-black' : 'text-slate-600'}>
-                      {isMe ? 'Clinical Control (You)' : getSenderName(msg.sender_type)}
+                      {isMe ? 'You' : getSenderName(msg.sender_type)}
                     </span>
-                    <span className="opacity-60">{format(new Date(msg.created_at), 'HH:mm • MMM d')}</span>
+                    <span className="opacity-40">{format(new Date(msg.created_at), 'HH:mm • MMM d')}</span>
                   </div>
                   
-                  <div className={`px-6 py-4 rounded-3xl text-sm leading-relaxed shadow-premium ${
+                  <motion.div 
+                    initial={{ scale: 0.98, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className={`px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                     isMe 
-                      ? 'bg-[#0f172a] text-white rounded-tr-sm' 
+                      ? 'bg-[#1e293b] text-white rounded-tr-none' 
                       : isPatient
-                        ? 'bg-white text-slate-800 border border-slate-200 rounded-tl-sm font-medium'
-                        : 'bg-indigo-600 text-white border-none rounded-tl-sm shadow-indigo-600/10' // AI
+                        ? 'bg-white text-slate-800 border border-slate-200 rounded-tl-none font-medium'
+                        : 'bg-indigo-600 text-white rounded-tl-none shadow-indigo-600/10' // AI
                   }`}>
                     {msg.content}
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             );
@@ -148,22 +151,23 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
       </div>
 
       {/* Input */}
-      <div className="p-6 border-t border-slate-100 bg-white/80 backdrop-blur-md">
-        <form onSubmit={handleSend} className="flex gap-4 relative">
+      <div className="p-4 border-t border-slate-100 bg-white/80 backdrop-blur-md">
+        <form onSubmit={handleSend} className="flex gap-3 relative">
           <input
             type="text"
             value={inputText}
             onChange={e => setInputText(e.target.value)}
-            placeholder={(thread.assigned_user_id || currentRole === 'CRO') ? "Type a secure physician response..." : "Triage takeover required to respond..."}
+            placeholder={(thread.assigned_user_id || currentRole === 'CRO') ? "Direct physician response..." : "Triage takeover required..."}
             disabled={!thread.assigned_user_id && currentRole !== 'CRO'}
-            className="flex-1 rounded-2xl border border-slate-200 bg-slate-50/50 px-6 py-4 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 disabled:bg-slate-50/50 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-300 placeholder:text-slate-400"
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-5 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all placeholder:text-slate-400"
           />
           <Button 
             type="submit" 
+            size="sm"
             disabled={sending || !inputText.trim() || (!thread.assigned_user_id && currentRole !== 'CRO')}
-            className={`px-8 rounded-2xl flex items-center gap-3 font-black text-[10px] uppercase tracking-widest transition-all duration-300 ${inputText.trim() ? 'bg-[#0f172a] text-white hover:scale-[1.02] shadow-bespoke' : 'bg-slate-200 text-slate-400'}`}
+            className={`px-6 rounded-xl flex items-center gap-2 font-black text-[9px] uppercase tracking-widest transition-all ${inputText.trim() ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'}`}
           >
-            {sending ? 'Encrypting...' : <><Send className="w-4 h-4" /> Send Message</>}
+            {sending ? 'Sending...' : <><Send className="w-3.5 h-3.5" /> Transmit</>}
           </Button>
         </form>
       </div>
