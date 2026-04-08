@@ -3,6 +3,7 @@ import type { Message, Thread } from '../../lib/types';
 import { Button } from '../../components/ui/Button';
 import { Send, UserCircle, Bot, Stethoscope, HeartPulse, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 interface ChatWindowProps {
   thread: Thread;
@@ -32,26 +33,30 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
   };
 
   const getSenderIcon = (type: string) => {
-    switch(type) {
+    const t = type.toLowerCase();
+    switch(t) {
       case 'patient': return <UserCircle className="w-5 h-5 text-slate-400" />;
       case 'ai': return <Bot className="w-5 h-5 text-indigo-500" />;
-      case 'Doctor': return <Stethoscope className="w-5 h-5 text-rose-500" />;
-      case 'Nurse': return <HeartPulse className="w-5 h-5 text-amber-500" />;
+      case 'doctor': return <Stethoscope className="w-5 h-5 text-rose-500" />;
+      case 'nurse': return <HeartPulse className="w-5 h-5 text-amber-500" />;
       default: return <UserCircle className="w-5 h-5 text-slate-400" />;
     }
   };
 
   const getSenderName = (type: string) => {
-    switch(type) {
-      case 'patient': return thread.metadata?.patient_name || thread.patient_name || 'Patient';
+    const t = type.toLowerCase();
+    const metadata = (thread.metadata as any) || {};
+    switch(t) {
+      case 'patient': return metadata.patient_name || thread.patient_name || 'Patient';
       case 'ai': return 'Sakhi AI Intelligence';
-      case 'Doctor': return 'Attending Physician';
-      case 'Nurse': return 'Triage Specialist';
+      case 'doctor': return 'Attending Physician';
+      case 'nurse': return 'Triage Specialist';
       default: return 'System Admin';
     }
   };
 
-  const patientName = thread.metadata?.patient_name || thread.patient_name || `Patient ${thread.id.slice(0, 4)}`;
+  const metadata = (thread.metadata as any) || {};
+  const patientName = metadata.patient_name || thread.patient_name || `Patient ${thread.id.slice(0, 4)}`;
 
   return (
     <div className="flex-1 flex flex-col bg-white h-full relative">
@@ -110,9 +115,7 @@ export function ChatWindow({ thread, messages, currentRole, onSendMessage, onTak
           </div>
         ) : (
           messages.map((msg) => {
-            const isMe = (msg.sender_type === 'CRO' && currentRole === 'CRO') || 
-                       (msg.sender_type === 'Nurse' && currentRole === 'Nurse') ||
-                       (msg.sender_type === 'Doctor' && currentRole === 'Doctor');
+            const isMe = (msg.sender_type.toLowerCase() === currentRole.toLowerCase());
             const isPatient = msg.sender_type === 'patient';
             const isAI = msg.sender_type === 'ai';
 

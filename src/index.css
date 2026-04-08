@@ -11,8 +11,8 @@
   --color-text-muted: #64748B;
   
   --font-sans: 'Figtree', sans-serif;
-  --shadow-premium: 0 10px 40px -10px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  --shadow-bespoke: 0 20px 60px -15px rgba(15, 23, 42, 0.12);
+  --shadow-premium: 0 10px 40px -10px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --shadow-bespoke: 0 20px 60px -15px rgba(15, 23, 42, 0.15);
 }
 
 body {
@@ -22,6 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* Base headings for consistency */
@@ -39,12 +40,10 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-bespoke);
 }
 
-.glass-floating {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: var(--shadow-premium);
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
 
 .custom-scrollbar-dark::-webkit-scrollbar {

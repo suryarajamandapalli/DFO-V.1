@@ -43,8 +43,9 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
           sortedThreads.map((thread) => {
             const isSelected = selectedThreadId === thread.id;
             const isRed = thread.status === 'red';
-            const patientName = thread.metadata?.patient_name || thread.patient_name || `Patient ${thread.id.slice(0, 4)}`;
-            const lastMsg = thread.metadata?.last_message || 'New triage request received';
+            const metadata = (thread.metadata as any) || {};
+            const patientName = metadata.patient_name || thread.patient_name || `Patient ${thread.id.slice(0, 4)}`;
+            const lastMsg = metadata.last_message || 'New triage request received';
             
             return (
               <motion.div
@@ -85,9 +86,9 @@ export function ThreadList({ threads, selectedThreadId, onSelectThread }: Thread
                     <Clock className="w-3 h-3" />
                     <span>{formatDistanceToNow(new Date(thread.updated_at || thread.created_at), { addSuffix: true })}</span>
                   </div>
-                  {thread.metadata?.risk_score && (
+                  {metadata.risk_score && (
                     <span className="text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100">
-                      INTEL: {thread.metadata.risk_score}%
+                      INTEL: {metadata.risk_score}%
                     </span>
                   )}
                 </div>

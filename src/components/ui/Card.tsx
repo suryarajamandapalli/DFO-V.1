@@ -15,7 +15,7 @@ export function Card({ className, children, delay = 0, glass = false, ...props }
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
       className={cn(
-        "rounded-2xl p-6 transition-all duration-300",
+        "rounded-lg p-6 transition-all duration-300",
         glass ? "glass-effect" : "bg-white card-shadow border border-slate-100 hover:border-sky-100",
         className
       )}

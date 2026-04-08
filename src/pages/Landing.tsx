@@ -1,31 +1,30 @@
 import { HeroSection } from '../components/sections/HeroSection';
 import { AboutSection } from '../components/sections/AboutSection';
 import { DFOArchitecture } from '../components/sections/DFOArchitecture';
-import { ThreadClassification } from '../components/sections/ThreadClassification';
 import { RoleBasedSystem } from '../components/sections/RoleBasedSystem';
 import { CoreFeatures } from '../components/sections/CoreFeatures';
-import { SystemIntelligence } from '../components/sections/SystemIntelligence';
 import { CTASection } from '../components/sections/CTASection';
 
 export function Landing() {
   return (
-    <>
+    <div className="overflow-x-hidden w-full bg-white selection:bg-sky-100 selection:text-sky-900">
       <HeroSection />
-      <div id="about">
+      
+      <div id="about" className="relative">
         <AboutSection />
       </div>
+      
       <DFOArchitecture />
-      <div id="intelligence">
-        <ThreadClassification />
-      </div>
-      <div id="roles">
+      
+      <div id="roles" className="relative">
         <RoleBasedSystem />
       </div>
-      <div id="features">
+      
+      <div id="features" className="relative">
         <CoreFeatures />
       </div>
-      <SystemIntelligence />
+      
       <CTASection />
-    </>
+    </div>
   );
 }

@@ -6,10 +6,8 @@ import {
   Users, 
   Baby, 
   Activity, 
-  Heart, 
   Search, 
   Filter, 
-  ExternalLink,
   ChevronRight,
   TrendingUp
 } from 'lucide-react';

@@ -53,7 +53,7 @@ export function SelectRole() {
     setLoading(role);
 
     try {
-      // Use UPSERT instead of UPDATE to ensure a row is created if missing
+      // 1. Assign Role
       const { error: upsertError } = await supabase
         .from('users')
         .upsert({ 
@@ -61,23 +61,29 @@ export function SelectRole() {
           role: role,
           email: user.email,
           full_name: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Clinical Member'
-        }, { onConflict: 'email' }); // Priority on email uniqueness to merge legacy/orphaned records
+        }, { onConflict: 'email' });
 
-      if (upsertError) {
-        console.error("UPSERT error for 'users' table:", upsertError);
-        throw upsertError;
-      }
+      if (upsertError) throw upsertError;
+
+      // 2. Log Welcome Notification (PRODUCTION ALIGNED)
+      await supabase.from('dfo_notification_logs').insert([
+        {
+          patient_id: user.id,
+          category: 'onboarding_complete',
+          payload: {
+            title: 'Welcome to DFO Clinic',
+            message: `Your professional profile as a ${role.toUpperCase()} is now active. Access your clinical dashboard to begin oversight.`
+          },
+          status: 'PENDING'
+        }
+      ]);
       
-      console.log(`Successfully assigned role: ${role}`);
-      
-      // Refresh Auth Context to trigger navigation
+      // 3. Refresh and Navigate
       await refreshProfile();
-      
-      // Explicit navigation as a fallback/accelerator
       navigate(`/dashboard/${role}`);
     } catch (err: any) {
       console.error("Critical failure resetting role:", err.message);
-      alert(`Role assignment failed: ${err.message}. Please try again or contact system administration.`);
+      alert(`Role assignment failed: ${err.message}`);
     } finally {
       setLoading(null);
     }
@@ -107,7 +113,6 @@ export function SelectRole() {
             <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full px-4">Development Environment</p>
             <button 
               onClick={() => {
-                // Mock context and navigate immediately
                 refreshProfile();
                 navigate('/dashboard/cro');
               }}
@@ -126,7 +131,7 @@ export function SelectRole() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * (idx + 1) }}
               onClick={() => handleRoleSelect(role.id)}
-              className={`relative bg-white rounded-2xl border-2 ${role.borderColor} ${role.hoverBorder} p-6 cursor-pointer shadow-sm hover:shadow-md transition-all group overflow-hidden`}
+              className={`relative bg-white rounded-xl border-2 ${role.borderColor} ${role.hoverBorder} p-6 cursor-pointer shadow-sm hover:shadow-md transition-all group overflow-hidden`}
             >
               <div className={`${role.bgColor} w-14 h-14 rounded-xl flex items-center justify-center mb-6`}>
                 <role.icon className={`w-7 h-7 ${role.color}`} />

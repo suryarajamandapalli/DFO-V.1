@@ -16,7 +16,7 @@ import {
   ShieldAlert,
   ArrowUpRight 
 } from 'lucide-react';
-import { sendClinicalMessage, assignThread } from '../../lib/dfoService';
+import { sendClinicalMessage } from '../../lib/dfoService';
 import { Button } from '../../components/ui/Button';
 
 export function NurseDashboard() {
@@ -110,7 +110,6 @@ export function NurseDashboard() {
 
   return (
     <DashboardLayout 
-      role="nurse" // Custom role for sidebar selection
       activeMenu="inbox"
       rightPanel={activeThread ? <ThreadInfoPanel thread={activeThread} /> : (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center opacity-30">
@@ -141,7 +140,7 @@ export function NurseDashboard() {
             { label: 'Escalated Cases', value: stats.escalated, icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50' },
             { label: 'Avg Response Time', value: stats.responseTime, icon: Timer, color: 'text-emerald-600', bg: 'bg-emerald-50' }
           ].map((kpi, idx) => (
-            <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
+            <div key={idx} className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
               <div className={`p-3.5 ${kpi.bg} ${kpi.color} rounded-2xl`}>
                 <kpi.icon className="w-6 h-6" />
               </div>
@@ -154,7 +153,7 @@ export function NurseDashboard() {
         </div>
 
         {/* MAIN WORKSPACE */}
-        <div className="flex-1 flex overflow-hidden rounded-[2.5rem] border border-slate-200/60 shadow-premium bg-white min-h-0">
+        <div className="flex-1 flex overflow-hidden rounded-xl border border-slate-200/60 shadow-premium bg-white min-h-0">
           {/* THREADS COLUMN (Yellow/Green) */}
           <div className="w-85 flex-shrink-0 flex flex-col border-r border-slate-50 bg-white">
              <div className="p-6 border-b border-slate-50 flex items-center justify-between">
@@ -184,7 +183,7 @@ export function NurseDashboard() {
                           </div>
                           <div>
                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Patient Triage</p>
-                             <h2 className="text-sm font-black text-slate-900 uppercase">{activeThread.metadata?.patient_name || activeThread.id.slice(0,8)}</h2>
+                             <h2 className="text-sm font-black text-slate-900 uppercase">{(activeThread.metadata as any)?.patient_name || activeThread.id.slice(0,8)}</h2>
                           </div>
                        </div>
                     </div>
@@ -210,7 +209,7 @@ export function NurseDashboard() {
                </>
              ) : (
                <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/20 text-slate-400 p-12">
-                  <div className="w-32 h-32 bg-white rounded-[3.5rem] shadow-premium flex items-center justify-center mb-10 overflow-hidden relative group">
+                  <div className="w-32 h-32 bg-white rounded-xl shadow-premium flex items-center justify-center mb-10 overflow-hidden relative group">
                     <div className="absolute inset-0 bg-sky-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-10" />
                     <HeartPulse className="w-16 h-16 text-sky-100 group-hover:text-sky-400 transition-colors duration-500" />
                   </div>

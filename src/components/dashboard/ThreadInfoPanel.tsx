@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import type { Thread, UserProfile, PatientProfile } from '../../lib/types';
+import type { Thread, UserProfile, Patient } from '../../lib/types';
 import { 
   Clock, 
   MapPin, 
@@ -16,6 +16,7 @@ import {
   FileText
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { motion } from 'framer-motion';
 
 interface ThreadInfoPanelProps {
   thread: Thread;
@@ -23,17 +24,17 @@ interface ThreadInfoPanelProps {
 
 export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
   const [assignedStaff, setAssignedStaff] = useState<UserProfile | null>(null);
-  const [patientData, setPatientData] = useState<PatientProfile | null>(null);
+  const [patientData, setPatientData] = useState<any | null>(null);
   const [riskReason, setRiskReason] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchDeepIntel() {
       // 1. Fetch Staff
-      if (thread.assigned_to) {
+      if (thread.assigned_user_id) {
         const { data } = await supabase
           .from('users')
           .select('*')
-          .eq('id', thread.assigned_to)
+          .eq('id', thread.assigned_user_id)
           .single();
         if (data) setAssignedStaff(data as UserProfile);
       } else {
@@ -41,13 +42,12 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
       }
 
       // 2. Fetch Patient Profile
-      if (thread.patient_id || thread.patient_name) {
+      if (thread.user_id) {
         let query = supabase.from('dfo_patients').select('*');
-        if (thread.patient_id) query = query.eq('id', thread.patient_id);
-        else query = query.eq('full_name', thread.patient_name);
+        query = query.eq('id', thread.user_id);
         
         const { data: patient } = await query.single();
-        if (patient) setPatientData(patient as PatientProfile);
+        if (patient) setPatientData(patient as Patient);
       }
 
       // 3. Fetch Risk Reasoning (from dfo_risk_logs)
@@ -70,7 +70,7 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
     green: 'text-emerald-600 bg-emerald-50 border-emerald-100'
   };
 
-  const currentJourney = patientData?.journey_stage || thread.journey_stage || 'pregnant';
+  const currentJourney = patientData?.journey_stage || (thread.metadata as any)?.journey_stage || 'pregnant';
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar p-6 space-y-7">
@@ -101,11 +101,6 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
                 <p className="text-sm font-bold text-slate-900 truncate">{assignedStaff.full_name}</p>
                 <div className="flex items-center gap-2">
                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{assignedStaff.role}</p>
-                   {assignedStaff.active_cases !== undefined && (
-                     <span className="text-[9px] font-black bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
-                       LOAD: {assignedStaff.active_cases}/{assignedStaff.max_cases}
-                     </span>
-                   )}
                 </div>
               </div>
             </div>
@@ -132,8 +127,8 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Journey Intelligence</h3>
-          <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-full border uppercase", riskColors[thread.risk_level])}>
-            {thread.risk_level} Risk
+          <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-full border uppercase", riskColors[thread.status])}>
+            {thread.status} Risk
           </span>
         </div>
         
@@ -160,11 +155,11 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
                   </div>
                 </div>
 
-                {(patientData?.pregnancy_stage || thread.pregnancy_stage) ? (
+                {(patientData?.pregnancy_stage || (thread.metadata as any)?.pregnancy_stage) ? (
                   <div className="space-y-3">
                     <div className="flex justify-between items-end">
                       <span className="text-[10px] font-black text-slate-800 uppercase tracking-tight">
-                        {patientData?.pregnancy_stage || thread.pregnancy_stage} Weeks Completed
+                        {patientData?.pregnancy_stage || (thread.metadata as any)?.pregnancy_stage} Weeks Completed
                       </span>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         Term: 40w
@@ -173,7 +168,7 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-50">
                       <motion.div 
                         initial={{ width: 0 }}
-                        animate={{ width: `${((patientData?.pregnancy_stage || thread.pregnancy_stage || 0) / 40) * 100}%` }}
+                        animate={{ width: `${((patientData?.pregnancy_stage || (thread.metadata as any)?.pregnancy_stage || 0) / 40) * 100}%` }}
                         className="h-full bg-sky-500 rounded-full"
                       />
                     </div>
@@ -207,7 +202,7 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Past History</span>
                </div>
                <div className="flex flex-wrap gap-1.5">
-                  {patientData.medical_history.slice(0, 3).map((item, idx) => (
+                  {patientData.medical_history.slice(0, 3).map((item: string, idx: number) => (
                     <span key={idx} className="text-[9px] font-bold bg-slate-50 text-slate-600 px-2 py-0.5 rounded border border-slate-100">
                       {item}
                     </span>
@@ -222,7 +217,7 @@ export function ThreadInfoPanel({ thread }: ThreadInfoPanelProps) {
       <section className="flex-1 min-h-0">
         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Platform Metadata</h3>
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-           {!thread.sla_met && thread.sla_breached && (
+            {(thread.metadata as any)?.sla_breached && (
              <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-center justify-between">
                 <span className="text-[10px] font-black text-rose-600 uppercase">SLA BREACHED</span>
                 <Clock className="w-4 h-4 text-rose-500 animate-pulse" />

@@ -1,8 +1,7 @@
 import { ShieldAlert, AlertTriangle, CheckCircle } from 'lucide-react';
-import type { RiskLevel } from '../../lib/types';
 
 interface RiskBadgeProps {
-  level: RiskLevel;
+  level: 'red' | 'yellow' | 'green';
 }
 
 export function RiskBadge({ level }: RiskBadgeProps) {

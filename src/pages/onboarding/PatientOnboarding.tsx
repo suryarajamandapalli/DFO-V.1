@@ -50,7 +50,7 @@ export function PatientOnboarding() {
       console.error("Onboarding failed:", err);
       alert("Failed to save onboarding data. Please try again.");
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
   };
 
@@ -59,7 +59,7 @@ export function PatientOnboarding() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-xl w-full bg-white rounded-[2.5rem] shadow-bespoke p-10 overflow-hidden relative"
+        className="max-w-xl w-full bg-white rounded-xl shadow-bespoke p-10 overflow-hidden relative"
       >
         <div className="absolute top-0 left-0 w-full h-2 bg-slate-100">
            <motion.div 
@@ -88,7 +88,7 @@ export function PatientOnboarding() {
                 <button
                   key={stage.id}
                   onClick={() => setFormData({ ...formData, journey_stage: stage.id as any })}
-                  className={`flex items-center justify-between p-6 rounded-3xl border-2 transition-all group ${
+                  className={`flex items-center justify-between p-6 rounded-xl border-2 transition-all group ${
                     formData.journey_stage === stage.id 
                       ? 'border-sky-500 bg-sky-50/50 shadow-lg' 
                       : 'border-slate-100 hover:border-sky-200'

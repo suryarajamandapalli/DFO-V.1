@@ -133,7 +133,7 @@ export function DoctorDashboard() {
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/20 text-slate-400 p-12">
-             <div className="p-10 rounded-[2.5rem] bg-white shadow-premium mb-8 rotate-3 hover:rotate-0 transition-transform duration-500">
+             <div className="p-10 rounded-xl bg-white shadow-premium mb-8 rotate-3 hover:rotate-0 transition-transform duration-500">
                 <Stethoscope className="w-16 h-16 text-sky-200" />
              </div>
              <h2 className="text-2xl font-black text-slate-800 tracking-tight mb-3">Physician Escalations</h2>

@@ -105,7 +105,7 @@ export function Signup() {
             {success && (
               <div className="bg-emerald-50 text-emerald-600 p-4 rounded-lg flex items-start gap-3 text-sm">
                 <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-                <span>Account created seamlessly. Please check your email inbox to verify your account before logging in.</span>
+                <span>Account created, Please check your email inbox to verify your account.</span>
               </div>
             )}
 

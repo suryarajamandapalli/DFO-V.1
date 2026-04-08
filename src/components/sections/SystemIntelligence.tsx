@@ -42,7 +42,7 @@ export function SystemIntelligence() {
           </div>
 
           <div className="lg:w-1/2 w-full">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 p-8">
+            <div className="relative rounded-xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 p-8">
               <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/20 rounded-full blur-[80px]" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]" />
               

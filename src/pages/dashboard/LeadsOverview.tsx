@@ -5,7 +5,6 @@ import {
   Users, 
   Phone, 
   MapPin, 
-  Calendar,
   Search, 
   Filter, 
   ChevronRight,
@@ -130,7 +129,7 @@ export function LeadsOverview() {
                       </td>
                     </tr>
                  ) : (
-                    filtered.map((l, idx) => (
+                    filtered.map((l) => (
                        <tr key={l.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer">
                           <td className="px-8 py-5">
                              <div className="flex items-center gap-4">

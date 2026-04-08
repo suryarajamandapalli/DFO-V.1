@@ -29,7 +29,7 @@ export function PatientInflowChart({ data }: ChartProps) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-premium h-[350px]"
+      className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium h-[350px]"
     >
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -83,7 +83,7 @@ export function RiskDistributionChart({ data }: ChartProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-premium h-[350px] flex flex-col"
+      className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium h-[350px] flex flex-col"
     >
       <div className="mb-6">
         <h3 className="text-sm font-black text-slate-800 tracking-tight mb-1">Risk Stratification</h3>

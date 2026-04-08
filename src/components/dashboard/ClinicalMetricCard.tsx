@@ -45,7 +45,7 @@ export function ClinicalMetricCard({
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       transition={{ duration: 0.4, delay }}
       className={cn(
-        "bg-white p-6 rounded-[2rem] border border-slate-100 shadow-premium border-l-4 transition-all duration-300",
+        "bg-white p-6 rounded-xl border border-slate-100 shadow-premium border-l-4 transition-all duration-300",
         variants[variant]
       )}
     >
